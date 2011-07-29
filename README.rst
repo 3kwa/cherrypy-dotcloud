@@ -44,7 +44,7 @@ Push and voila_!
 What's next?
 ------------
 
-Not sure yet but I want to play.
+Using GitHub tags (and branches) to write a step by step tutorial ... Maybe ;)
 
 .. _2004: http://www.cherrypy.org/wiki/WSGI
 .. _cherrypy: http://www.cherrypy.org
