@@ -1,78 +1,96 @@
-Using CherryPy on DotCloud
+Using CherryPy on dotCloud
 ==========================
 
-In the quickstart_ section we saw how easy it is to use CherryPy_ on dotCloud_, skipping the installing dotCloud_, creating an app and deploying it. Let's briefly correct that omission.
+We are using tags to iterate through sections of an *exploratory tutorial* using CherryPy_ to discover dotCloud_:
 
-One step back
--------------
+1. quickstart_ from zero to hello in no time
+2. static_ serving static content
 
-Installing dotCloud_ is as east as pip_::
+Although dotCloud_ makes it super easy to have something up and running, in
+development mode we favor working locally and pushing for testing, staging or production.
 
-    $ pip install dotcloud
+CherryPy server
+---------------
 
-You can then create a dotCloud_ app (let's call it **cherrypy**)::
+CherryPy_ comes with a *production-ready, HTTP/1.1-compliant server*. To
+paraphrase SQLite_ `when to use`_ document, the CherryPy_ server could be used as is for *99.9% of the websites around*. It is that good ;)
 
-    $ dotcloud create cherrypy
+Quick and dirty
+---------------
 
-If it is the first time you run the ``dotcloud`` command you will be prompted for
-your API key which you can find in the dotCloud_ settings_ section.
+The quickest way to have a local *development* server running is to use the
+idiomatic `if __name__ == "__main__"` block::
 
-In dotCloud_ lingo **cherrypy** is the *deployment name* and guess what, deploying is a breeze::
+    if __name__ == "__main__":
+        cherrypy.quickstart
 
-    $ dotcloud push cherrypy
+Adding these 2 lines at then end of **wsgi.py** and we are good to go::
 
-Yes it is that easy_!
+    $ python wsgi.py
 
-Looking at the logs
+We have a server running (on 127.0.0.1:8080 by default) with autoreload and
+many other goodies, and it appears to be working. Opening a browser we see
+*Hello!* and the favicon and looking at the log everything seems fine but ...
+
+Shameless promotion
 -------------------
 
-One of the many commands ``dotcloud`` understand is ``logs``::
+CherryPy_ is configured to automagically use its favicon if none is available!
+If **Root.index** returns *elaborate* html::
 
-    $ dotcloud logs cherrypy.www
+    <!DOCTYPE HTML>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>CherryPy on dotCloud : a match made in heaven</title>
+    </head>
+    <body>
+        <img src="static/cherrypy.png" alt="CherryPy" />
+        <img src="static/dotcloud.png" alt="dotCloud" />
+    </body>
+    </html>
 
-Which runs the equivalent of ``tail -f`` on the relevant logs. We specified
-the *deployment name* and the *service name*. So far we only have one service called **www**.
+Duh!
 
-The **error.log** contains two lines related to static content, let's focus on the first::
+Static configuration
+--------------------
 
-    2011/07/30 09:28:25 [error] 13377#0: *32 open() "/home/dotcloud/current/static/favicon.ico" failed (2: No such file or directory), client: 10.68.47.216, server: hello-default-www-0, request: "GET /favicon.ico HTTP/1.0", host: "f3250dc8.dotcloud.com"
+Despite having both PNGs in the static folder, CherryPy_ doesn't know *yet*
+how to look for them. Let's tweak our `if __name__ == "__main__"` block
+a little::
 
-Most browsers look for a favicon_, we don't have one yet. A good opportunity to look at static content.
+    if __name__ == "__main__":
 
-Static
-------
+        import os.path
 
-Unless specified otherwise browsers look for the favicon_ at the root under
-the name **favicon.ico**. A dotCloud_ instance is smart enough to serve it from
-the **static** folder.
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        config = {'/static' : {
+            'tools.staticdir.on': True,
+            'tools.staticdir.dir': os.path.join(current_dir, 'static')
+            }}
+        application.merge(config)
 
-Check the source ...
+        cherrypy.quickstart()
 
-Visit the site_ and check the logs! No more errors and in **access.log** a pleasing status 200 line::
+CherryPy_ comes with a collection of `builtin tools`_, one of them to serve
+static content. To configure_ CherryPy_ we use a Python_ dictionnary.
 
-    10.68.47.216 (175.39.21.234) - - [30/Jul/2011:10:28:43 +0000] "GET /favicon.ico HTTP/1.0" 200 1406 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Chrome/12.0.742.122 Safari/534.30"
-
-How cool is that?! dotCloud_ is configured to serve static content from a
-static folder accessible at /static_. Probably a great place to keep CSS, javascript, images ... ;)
-
-Side note
----------
-
-dotCloud_ offers a `static service`_ as well, *a simple web server that can be used to host static content (images, packages...) efficiently*. In our case,
-we don't need to explicitly set one up.
+We are telling CherryPy_ to use the **staticdir** tool to serve requests
+for **/static**. Then, we update the configuration of the WSGI_ **application**
+used by dotCloud_ ... done!
 
 What's next?
 ------------
 
-Setting things up for local testing. CherryPy_ shines!
+Not sure yet :P
 
 .. _quickstart: https://github.com/3kwa/cherrypy-dotcloud/tree/quickstart
+.. _static: https://github.com/3kwa/cherrypy-dotcloud/tree/static
 .. _cherrypy: http://www.cherrypy.org
 .. _dotcloud: https://www.dotcloud.com
-.. _settings: https://www.dotcloud.com/accounts/settings
-.. _easy: http://f3250dc8.dotcloud.com/
-.. _site: http://f3250dc8.dotcloud.com/
-.. _favicon: http://en.wikipedia.org/wiki/Favicon
-.. _pip: http://www.pip-installer.org/
-.. _static: http://f3250dc8.dotcloud.com/static/favicon.ico
-.. _`static service`: http://docs.dotcloud.com/services/static/
+.. _sqlite: http://www.sqlite.org
+.. _`when to use`: http://www.sqlite.org/whentouse.html
+.. _`builtin tools`: http://www.cherrypy.org/wiki/BuiltinTools
+.. _configure: http://www.cherrypy.org/wiki/ConfigAPI
+.. _Python: http://www.python.org
+.. _wsgi: http://www.wsgi.org
