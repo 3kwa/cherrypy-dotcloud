@@ -1,57 +1,55 @@
 Using CherryPy on DotCloud
 ==========================
 
-Why?
-----
+In the quickstart_ section we saw how easy it is to use CherryPy_ on dotCloud_, skipping the installing dotCloud_, creating an app and deploying it. Let's briefly correct that omission.
 
-It is so easy it is not funny! WSGI_ is your friend (read the doc_).
+One step back
+-----------
 
-CherryPy_, a mature and maintained fun way to do web with Python_, does WSGI_
-since 2004_.
+Installing dotCloud_ is as east as pip_::
 
-The DotCloud_ team documented *trendier* options but I never tried to recover
-from a bad first Django_ experience_.
+    $ pip install dotcloud
 
-Cherries blossom in the cloud too!
+You can then create a dotCloud_ app (let's call it **cherrypy**)::
 
-How?
-----
+    $ dotcloud create cherrypy
 
-Tell Dotcloud_ you are using a Python_ service in the **dotcloud.yml** file::
+If it is the first time you run the ``dotcloud`` command you will be prompted for
+your API key which you can find in the dotCloud_ settings_ section.
 
-    www:
-        type: python
+In dotCloud_ lingo **cherrypy** is the *deployment name* and guess what, deploying is a breeze::
 
-Claim your love for CherryPy_ in the **requirements.txt** file (PIP style)::
+    $ dotcloud push cherrypy
 
-    CherryPy==3.2.0
+Yes it is that easy_!
 
-Then, in a file named **wsgi.py** file, create a wsgi_ callable called
-**application**::
+Looking at the logs
+-------------------
 
-    import cherrypy
+One of the many commands ``dotcloud`` understand is ``logs``::
 
-    class Root:
+    $ dotcloud logs cherrypy.www
 
-        @cherrypy.expose
-        def index(self):
-            return "Hello!"
+Which runs the equivalent of ``tail -f`` on the relevant logs. We specified
+the *deployment name* and the *service name*. So far we only have one service called **www***.
 
-    application = cherrypy.tree.mount(Root(), '')
+The error.log contains two lines related to static content, let's focus on the first::
 
-Push and voila_!
+    2011/07/30 09:28:25 [error] 13377#0: *32 open() "/home/dotcloud/current/static/favicon.ico" failed (2: No such file or directory), client: 10.68.47.216, server: hello-default-www-0, request: "GET /favicon.ico HTTP/1.0", host: "f3250dc8.dotcloud.com"
 
-What's next?
-------------
+Most browsers look for a favicon_, we don't have one yet. A good opportunity to look at static content.
 
-Using GitHub tags (and branches) to write a step by step tutorial ... Maybe ;)
+Static
+------
 
-.. _2004: http://www.cherrypy.org/wiki/WSGI
+Unless specified otherwise browsers look for the favicon_ at the **root** under
+the name **favicon.ico**. A dotCloud_ instance is smart enough to serve it from
+the **static** folder.
+
+
+.. _quickstart: https://github.com/3kwa/cherrypy-dotcloud/tree/quickstart
 .. _cherrypy: http://www.cherrypy.org
-.. _wsgi: http://wsgi.org/
-.. _doc: http://docs.dotcloud.com/services/python/
-.. _python: http://www.python.org
 .. _dotcloud: https://www.dotcloud.com
-.. _django: http://www.djangoproject.com
-.. _voila: http://f3250dc8.dotcloud.com/
-.. _experience: http://colivri.org
+.. _settings: https://www.dotcloud.com/accounts/settings
+.. _easy: http://f3250dc8.dotcloud.com/
+.. _favicon: http://en.wikipedia.org/wiki/Favicon
