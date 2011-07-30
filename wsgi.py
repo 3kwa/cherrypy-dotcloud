@@ -18,16 +18,3 @@ class Root:
 </html>"""
 
 application = cherrypy.tree.mount(Root(), '')
-
-if __name__ == "__main__":
-
-    import os.path
-
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    config = {'/static' : {
-        'tools.staticdir.on': True,
-        'tools.staticdir.dir': os.path.join(current_dir, 'static')
-        }}
-    application.merge(config)
-
-    cherrypy.quickstart()

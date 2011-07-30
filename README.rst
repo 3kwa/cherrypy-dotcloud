@@ -77,12 +77,34 @@ static content. To configure_ CherryPy_ we use a Python_ dictionnary.
 
 We are telling CherryPy_ to use the **staticdir** tool to serve requests
 for **/static**. Then, we update the configuration of the WSGI_ **application**
-used by dotCloud_ ... done!
+used by dotCloud_ ... done?
+
+Fabric
+------
+
+We would probably be better off keeping the CherryPy_ related code away from the
+dotCloud_ WSGI_ code. Why not use the brilliant Fabric_ for that?
+
+Let's move the `if __name__ == "__main__"` block into a **serve** Fabric_ task (defined in **fabfile.py**). Now to run our local dev server we do::
+
+    $ fab serve
+
+And if we want to run it on another port::
+
+    $ fab server:3000
+
+Schnazy, isn't it?
+
+.dotcloudignore
+---------------
+
+**fabfile.py** does not need to be pushed on dotCloud_. There are ways_ to
+exclude files from being pushed but ... none satisfying.
 
 What's next?
 ------------
 
-Not sure yet :P
+Not sure yet, probably something session related!
 
 .. _quickstart: https://github.com/3kwa/cherrypy-dotcloud/tree/quickstart
 .. _static: https://github.com/3kwa/cherrypy-dotcloud/tree/static
@@ -94,3 +116,5 @@ Not sure yet :P
 .. _configure: http://www.cherrypy.org/wiki/ConfigAPI
 .. _Python: http://www.python.org
 .. _wsgi: http://www.wsgi.org
+.. _fabric: http://fabfile.org
+.. _ways: http://docs.dotcloud.com/guides/git-hg/#excluding-files-from-the-push
