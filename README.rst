@@ -5,116 +5,89 @@ We are using tags to iterate through sections of an *exploratory tutorial* using
 
 1. quickstart_ from zero to hello in no time
 2. static_ serving static content
+3. local_ dev server (made spunkier using Fabric_)
 
-Although dotCloud_ makes it super easy to have something up and running, in
-development mode we favor working locally and pushing for testing, staging or production.
 
-CherryPy server
----------------
+Now to explore dotCloud_ a bit further let's look at the all mighty sessions_,
+central to most web apps and an opportunity to roll out a new scallable service.
 
-CherryPy_ comes with a *production-ready, HTTP/1.1-compliant server*. To
-paraphrase SQLite_ `when to use`_ document, the CherryPy_ server could be used as is for *99.9% of the websites around*. It is that good ;)
+The Zen of ...
+--------------
 
-Quick and dirty
----------------
+CherryPy_ has its own Zen_ (video_). It's first two koans state that:
 
-The quickest way to have a local *development* server running is to use the
-idiomatic `if __name__ == "__main__"` block::
+    Common tasks should be fast and easy
+    Doing nothing should be easier and faster
 
-    if __name__ == "__main__":
-        cherrypy.quickstart
+You want to use sessions_ in CherryPy_, turn them on in the configuration_::
 
-Adding these 2 lines at then end of **wsgi.py** and we are good to go::
+    'tools.session.on' : True
 
-    $ python wsgi.py
+That's all!
 
-We have a server running (on 127.0.0.1:8080 by default) with autoreload and
-many other goodies, and it appears to be working. Opening a browser we see
-*Hello!* and the favicon and looking at the log everything seems fine but ...
+The default backend for sessions storage is memory. It works well for most
+web applications but we want to be ready to scale beyond one CherryPy_ instance
+hence will use something schnazier : Redis_
 
-Shameless promotion
--------------------
+Redis on dotCloud
+-----------------
 
-CherryPy_ is configured to automagically use its favicon if none is available!
-If **Root.index** returns *elaborate* html::
+To create a new redis instance on dotCloud_ we need to add a few line to our
+build file::
 
-    <!DOCTYPE HTML>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>CherryPy on dotCloud : a match made in heaven</title>
-    </head>
-    <body>
-        <img src="static/cherrypy.png" alt="CherryPy" />
-        <img src="static/dotcloud.png" alt="dotCloud" />
-    </body>
-    </html>
+    session:
+        type: redis
 
-Duh!
+Redis_ is notorious for its ease of deployement but that is trivial :P How do
+we connect to that service you may wonder.
 
-Static configuration
+::
+    $ dotcloud info tutorial.session
+    cluster: wolverine
+    config:
+        redis_password: lshYSDfQDe
+    created_at: 1310511988.2404289
+    ports:
+    -   name: ssh
+        url: ssh://redis@bd0715e0.dotcloud.com:7473
+    -   name: redis
+        url: redis://redis:lshYSDfQDe@bd0715e0.dotcloud.com:7474
+    state: running
+    type: redis
+
+But we know better than to hard code such things ...
+
+dotCloud environment
 --------------------
 
-Despite having both PNGs in the static folder, CherryPy_ doesn't know *yet*
-how to look for them. Let's tweak our `if __name__ == "__main__"` block
-a little::
+When dotCloud_ builds your application it create a file in the home directory of
+your services named **environment.json**. For a Redis_ service it will contain
+the following keys:
 
-    if __name__ == "__main__":
++ DOTCLOUD_DATA_REDIS_HOST
++ DOTCLOUD_DATA_REDIS_LOGIN
++ DOTCLOUD_DATA_REDIS_PASSWORD
++ DOTCLOUD_DATA_REDIS_PORT
++ DOTCLOUD_DATA_REDIS_URL
 
-        import os.path
+Which we can use to configure_ CherryPy_!
 
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        config = {'/static' : {
-            'tools.staticdir.on': True,
-            'tools.staticdir.dir': os.path.join(current_dir, 'static')
-            }}
-        application.merge(config)
-
-        cherrypy.quickstart()
-
-CherryPy_ comes with a collection of `builtin tools`_, one of them to serve
-static content. To configure_ CherryPy_ we use a Python_ dictionnary.
-
-We are telling CherryPy_ to use the **staticdir** tool to serve requests
-for **/static**. Then, we update the configuration of the WSGI_ **application**
-used by dotCloud_ ... done?
-
-Fabric
-------
-
-We would probably be better off keeping the CherryPy_ related code away from the
-dotCloud_ WSGI_ code. Why not use the brilliant Fabric_ for that?
-
-Let's move the `if __name__ == "__main__"` block into a **serve** Fabric_ task (defined in **fabfile.py**). Now to run our local dev server we do::
-
-    $ fab serve
-
-And if we want to run it on another port::
-
-    $ fab server:3000
-
-Schnazy, isn't it?
-
-.dotcloudignore
----------------
-
-**fabfile.py** does not need to be pushed on dotCloud_. There are ways_ to
-exclude files from being pushed but ... none satisfying.
+Putting it all together
+-----------------------
 
 What's next?
 ------------
 
-Not sure yet, probably something session related!
+More play \o/!
 
-.. _quickstart: https://github.com/3kwa/cherrypy-dotcloud/tree/quickstart
-.. _static: https://github.com/3kwa/cherrypy-dotcloud/tree/static
 .. _cherrypy: http://www.cherrypy.org
 .. _dotcloud: https://www.dotcloud.com
-.. _sqlite: http://www.sqlite.org
-.. _`when to use`: http://www.sqlite.org/whentouse.html
-.. _`builtin tools`: http://www.cherrypy.org/wiki/BuiltinTools
-.. _configure: http://www.cherrypy.org/wiki/ConfigAPI
-.. _Python: http://www.python.org
-.. _wsgi: http://www.wsgi.org
+.. _quickstart: https://github.com/3kwa/cherrypy-dotcloud/tree/quickstart
+.. _static: https://github.com/3kwa/cherrypy-dotcloud/tree/static
+.. _local: https://github.com/3kwa/cherrypy-dotcloud/tree/local-fabric
 .. _fabric: http://fabfile.org
-.. _ways: http://docs.dotcloud.com/guides/git-hg/#excluding-files-from-the-push
+.. _zen: http://www.cherrypy.org/wiki/ZenOfCherryPy
+.. _video: http://blip.tv/pycon-us-videos-2009-2010-2011/pycon-2010-the-zen-of-cherrypy-111-3352128
+.. _sessions: http://www.cherrypy.org/wiki/CherryPySessions
+.. _redis: http://redis.io
+.. _environment: http://docs.dotcloud.com/guides/environment/

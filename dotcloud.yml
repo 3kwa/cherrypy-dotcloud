@@ -1,3 +1,4 @@
 www:
-  type: python
-
+    type: python
+session:
+    type: redis
