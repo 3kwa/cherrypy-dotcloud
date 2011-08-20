@@ -64,11 +64,11 @@ When dotCloud_ builds your application it create a file in the home directory of
 your services named **environment.json**. For a Redis_ service it will contain
 the following keys:
 
-+ DOTCLOUD_DATA_REDIS_HOST
-+ DOTCLOUD_DATA_REDIS_LOGIN
-+ DOTCLOUD_DATA_REDIS_PASSWORD
-+ DOTCLOUD_DATA_REDIS_PORT
-+ DOTCLOUD_DATA_REDIS_URL
++ DOTCLOUD_ *SESSION* _REDIS_HOST
++ DOTCLOUD_ *SESSION* _REDIS_LOGIN
++ DOTCLOUD_ *SESSION* _REDIS_PASSWORD
++ DOTCLOUD_ *SESSION* _REDIS_PORT
++ DOTCLOUD_ *SESSION* _REDIS_URL
 
 Which we can use to configure_ CherryPy_!
 
