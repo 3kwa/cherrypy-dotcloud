@@ -41,7 +41,8 @@ build file::
 Redis_ is notorious for its ease of deployement but that is trivial :P How do
 we connect to that service you may wonder.
 
-::
+    ::
+
     $ dotcloud info tutorial.session
     cluster: wolverine
     config:
