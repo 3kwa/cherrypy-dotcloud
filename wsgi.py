@@ -17,8 +17,8 @@ class Root:
 </body>
 </html>"""
 
-config = {
+config = {'/' :{
     'tools.session.on' : True
-}
+}}
 
 application = cherrypy.tree.mount(Root(), '', config=config)
