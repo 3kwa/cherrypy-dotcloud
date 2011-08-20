@@ -10,7 +10,7 @@ class Root:
         cherrypy.session['counter'] = counter + 1
         return counter
 
-with open('/home/dotcloud/environment.js') as f:
+with open('/home/dotcloud/environment.json') as f:
     environment = json.load(f)
 
 config = {'/' :{
