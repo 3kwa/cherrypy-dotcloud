@@ -43,18 +43,18 @@ we connect to that service you may wonder.
 
     ::
 
-    $ dotcloud info tutorial.session
-    cluster: wolverine
-    config:
-        redis_password: lshYSDfQDe
-    created_at: 1310511988.2404289
-    ports:
-    -   name: ssh
-        url: ssh://redis@bd0715e0.dotcloud.com:7473
-    -   name: redis
-        url: redis://redis:lshYSDfQDe@bd0715e0.dotcloud.com:7474
-    state: running
-    type: redis
+        $ dotcloud info tutorial.session
+        cluster: wolverine
+        config:
+            redis_password: lshYSDfQDe
+        created_at: 1310511988.2404289
+        ports:
+        -   name: ssh
+            url: ssh://redis@bd0715e0.dotcloud.com:7473
+        -   name: redis
+            url: redis://redis:lshYSDfQDe@bd0715e0.dotcloud.com:7474
+        state: running
+        type: redis
 
 But we know better than to hard code such things ...
 
