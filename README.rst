@@ -14,7 +14,7 @@ central to most web apps and an opportunity to roll out a new scallable service.
 The Zen of ...
 --------------
 
-CherryPy_ has its own Zen_ (video_). It's first two koans state that:
+CherryPy_ has its own Zen_ (video_). It's first two koans state that::
 
     Common tasks should be fast and easy
     Doing nothing should be easier and faster
@@ -40,8 +40,6 @@ build file::
 
 Redis_ is notorious for its ease of deployement but that is trivial :P How do
 we connect to that service you may wonder.
-
-    ::
 
         $ dotcloud info tutorial.session
         cluster: wolverine
