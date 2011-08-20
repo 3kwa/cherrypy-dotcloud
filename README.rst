@@ -39,7 +39,9 @@ build file::
         type: redis
 
 Redis_ is notorious for its ease of deployement but that is trivial :P How do
-we connect to that service you may wonder.::
+we connect to that service you may wonder.
+
+::
 
     $ dotcloud info tutorial.session
     cluster: wolverine
@@ -63,21 +65,63 @@ When dotCloud_ builds your application it create a file in the home directory of
 your services named **environment.json**. For a Redis_ service it will contain
 the following keys:
 
-+ DOTCLOUD_*SESSION*_REDIS_HOST
-+ DOTCLOUD_*SESSION*_REDIS_LOGIN
-+ DOTCLOUD_*SESSION*_REDIS_PASSWORD
-+ DOTCLOUD_*SESSION*_REDIS_PORT
-+ DOTCLOUD_*SESSION*_REDIS_URL
++ DOTCLOUD_SESSION_REDIS_HOST
++ DOTCLOUD_SESSION_REDIS_LOGIN
++ DOTCLOUD_SESSION_REDIS_PASSWORD
++ DOTCLOUD_SESSION_REDIS_PORT
++ DOTCLOUD_SESSION_REDIS_URL
 
-Which we can use to configure_ CherryPy_!
+Note that *SESSION* is the name of the Redis_ service we specified in the build
+file. It can be whatever you want.
+
+::
+
+    with open('/home/dotcloud/environment.json') as f:
+        environment = json.load(f)
+
+Is all you need to load the content of **environment.json** in the aptly name
+**environment** variable :P
+
+We can use this information to configure_ CherryPy_ but first ...
+
+Dependencies
+------------
+
+CherryPy_ doesn't support Redis_ backend out of the box. The cherrys_ python
+package comes to the rescue ;) First let's add 2 lines to our requirements.txt
+
+::
+
+    cherrys>=0.3
+    hiredis
+
+We talked about it before, straightforward pip_ freeze_ format.
 
 Putting it all together
 -----------------------
 
+Now we plug in the redis backend into CherryPy_ (explicit is better than
+implicit cf PEP20_)::
+
+    import cherrys
+    cherrypy.lib.sessions.RedisSession = cherrys.RedisSession
+
+And configure_ our application::
+
+    config = {'/' :{
+        'tools.sessions.on' : True,
+        'tools.sessions.storage_type' : 'redis',
+        'tools.sessions.host' : environment['DOTCLOUD_SESSION_REDIS_HOST'],
+        'tools.sessions.port' : environment['DOTCLOUD_SESSION_REDIS_PORT'],
+        'tools.sessions.password' : environment['DOTCLOUD_SESSION_REDIS_PASSWORD']
+    }}
+
+Voila_ : a dummy web application that counts the number of visits :P
+
 What's next?
 ------------
 
-More play \o/!
+More play **\\o/**
 
 .. _cherrypy: http://www.cherrypy.org
 .. _dotcloud: https://www.dotcloud.com
@@ -90,3 +134,10 @@ More play \o/!
 .. _sessions: http://www.cherrypy.org/wiki/CherryPySessions
 .. _redis: http://redis.io
 .. _environment: http://docs.dotcloud.com/guides/environment/
+.. _configure: http://docs.cherrypy.org/stable/concepts/config.html
+.. _configuration: http://docs.cherrypy.org/stable/concepts/config.html
+.. _cherrys: http://pypi.python.org/pypi/cherrys
+.. _pip: http://www.pip-installer.org/
+.. _freeze: http://www.pip-installer.org/en/latest/index.html#freezing-requirements
+.. _pep20: http://www.python.org/dev/peps/pep-0020/
+.. _voila: http://78a277f4.dotcloud.com/
