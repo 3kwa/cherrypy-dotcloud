@@ -20,7 +20,7 @@ config = {'/' :{
     'tools.sessions.on' : True,
     'tools.sessions.storage_type' : 'redis',
     'tools.sessions.host' : environment['DOTCLOUD_SESSION_REDIS_HOST'],
-    'tools.sessions.port' : environment['DOTCLOUD_SESSION_REDIS_PORT'],
+    'tools.sessions.port' : int(environment['DOTCLOUD_SESSION_REDIS_PORT']),
     'tools.sessions.password' : environment['DOTCLOUD_SESSION_REDIS_PASSWORD']
 }}
 
