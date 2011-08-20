@@ -11,7 +11,7 @@ class Root:
     def index(self):
         counter = cherrypy.session.get('counter', 0)
         cherrypy.session['counter'] = counter + 1
-        return counter
+        return "%i" % counter
 
 with open('/home/dotcloud/environment.json') as f:
     environment = json.load(f)
