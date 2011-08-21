@@ -21,7 +21,7 @@ CherryPy_ has its own Zen_ (video_). It's first two koans state that::
 
 You want to use sessions_ in CherryPy_, turn them on in the configuration_::
 
-    'tools.session.on' : True
+    'tools.sessions.on' : True
 
 That's all!
 
@@ -56,7 +56,8 @@ we connect to that service you may wonder.
     state: running
     type: redis
 
-But we know better than to hard code such things ...
+But we know better than to hard code such things (by the way this are not the real
+values, we borrowed the output from the dotCloud_ Redis_ doc_ ).
 
 dotCloud environment
 --------------------
@@ -87,7 +88,7 @@ We can use this information to configure_ CherryPy_ but first ...
 Dependencies
 ------------
 
-CherryPy_ doesn't support Redis_ backend out of the box. The cherrys_ python
+CherryPy_ doesn't support Redis_ as a backend out of the box. The cherrys_ python
 package comes to the rescue ;) First let's add 2 lines to our requirements.txt
 
 ::
@@ -118,10 +119,16 @@ And configure_ our application::
 
 Voila_ : a dummy web application that counts the number of visits :P
 
+Note that we have removed the Fabric_ file to concentrate on the session subject
+rather than the *environment* gymkana.
+
 What's next?
 ------------
 
-More play **\\o/**
+More than likely the last iteration of this tutorial, probably involving a
+datastore/database of some description (`stay tuned`_). Something a bit more
+involved that showing the number of time a person visit the page_ but not much
+more ;)
 
 .. _cherrypy: http://www.cherrypy.org
 .. _dotcloud: https://www.dotcloud.com
@@ -141,3 +148,7 @@ More play **\\o/**
 .. _freeze: http://www.pip-installer.org/en/latest/index.html#freezing-requirements
 .. _pep20: http://www.python.org/dev/peps/pep-0020/
 .. _voila: http://78a277f4.dotcloud.com/
+.. _fabric: http://fabfile.org
+.. _doc: http://docs.dotcloud.com/services/redis/
+.. _stay tuned: https://github.com/3kwa/cherrypy-dotcloud/toggle_watch
+.. _page: http://78a277f4.dotcloud.com/
